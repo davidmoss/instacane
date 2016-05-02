@@ -29,7 +29,7 @@ class Instagram(object):
 
         media_data = None
         try:
-            if oembed_data:
+            if oembed_data and False: # TODO: Disabling the instragam integration as in sandbox
                 media_data = self.instagram.media(oembed_data['media_id'])
         except Exception as reason:
             print("Error retrieving image metadata for %s, %s" % (
