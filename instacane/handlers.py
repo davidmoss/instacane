@@ -25,6 +25,7 @@ class InstacaneHandler(tornado.web.RequestHandler):
         self.page_header = config.get('headers', 'header')
         self.page_subheader = config.get('headers', 'subheader')
         self.page_title = config.get('headers', 'title')
+        self.memcache_url = config.get('cache', 'hostname')
         super(InstacaneHandler, self).__init__(*args, **kwargs)
 
     def get(self):
@@ -33,7 +34,7 @@ class InstacaneHandler(tornado.web.RequestHandler):
         else:
             captions_enabled = False
 
-        mc = memcache.Client(['localhost:11211'], debug=0)
+        mc = memcache.Client([self.memcache_url], debug=0)
         latest_photos = json.loads(mc.get("latest_photos"))
         latest_ts = mc.get("latest_ts")
 
@@ -50,10 +51,9 @@ class InstacaneFeedHandler(tornado.web.RequestHandler):
         super(InstacaneFeedHandler, self).__init__(*args, **kwargs)
 
     def get(self):
-        mc = memcache.Client(['localhost:11211'], debug=0)
+        mc = memcache.Client([get_config().get('cache', 'hostname')], debug=0)
         latest_photos = json.loads(mc.get("latest_photos"))
         feed_data = json.dumps(latest_photos)
         self.set_header("Content-Type", "application/json")
         self.write(feed_data)
         self.finish()
-

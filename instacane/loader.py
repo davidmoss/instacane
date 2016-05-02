@@ -14,8 +14,9 @@ import json
 import datetime
 import urlparse
 import memcache
-import pymongo
 import requests
+from pymongo import MongoClient
+
 from instacane.insta_gram import Instagram
 from instacane.twit_ter import Twitter
 from instacane.location import get_location_gmaps
@@ -42,8 +43,7 @@ class MediaLoader(object):
             [self.config.get('cache', 'hostname')], debug=1)
         self.memcache.set('testing', 'connection')
         self.memcache.delete('testing')
-        self.mongo = pymongo.Connection(
-            self.config.get('db', 'hostname'))
+        self.mongo = MongoClient(self.config.get('db', 'hostname'))
 
     def load_instacane_data(self):
         items = self._search_keywords_on_twitter()
@@ -95,7 +95,7 @@ class MediaLoader(object):
                 img_data = self._get_instagram_image_data(
                     instagram_link)
             except Exception as reason:
-                print("Unable to fetch image metadata: error = %s" % reason)
+                print("Unable to fetch image data: error = %s" % reason)
                 continue
 
             if img_data['direct_img_url'].find('.mp4') != -1:
@@ -126,8 +126,7 @@ class MediaLoader(object):
             img_data = self.instagram.get_image_metadata(
                 instagram_link)
         except Exception as reason:
-            print("Unable to fetch image metadata: error = %s" % reason)
-            raise
+            raise reason
 
         oembed_data = img_data['oembed']
         if oembed_data is None:
@@ -136,7 +135,7 @@ class MediaLoader(object):
         image_data = {
             'instagram_sn': oembed_data['author_name'],
             'instagram_caption': oembed_data['title'],
-            'direct_img_url': oembed_data['url'],
+            'direct_img_url': oembed_data['thumbnail_url'],
             'geolocation': ""
         }
         media_data = img_data['media']
@@ -209,4 +208,3 @@ class MediaLoader(object):
 
     def _get_domains_query(self):
         return ' OR '.join(self.instagram_domains)
-

@@ -20,12 +20,12 @@ class Twitter(object):
     def search(self, query, num_pages=1):
         all_results = []
         results = self.twitter.GetSearch(
-            query, count=100, result_type='mixed')
+            query, count=100, result_type='mixed', until='2012-10-30')
         all_results, max_id = self._append_page(all_results,
             results, results[0].id)
         for i in range(0, num_pages - 1):
             results = self.twitter.GetSearch(
-                query, count=100, max_id=max_id, result_type='mixed')
+                query, count=100, max_id=max_id, result_type='mixed', until='2012-10-30')
             all_results, max_id = self._append_page(all_results, results, max_id)
         return all_results
 
