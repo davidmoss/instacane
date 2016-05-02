@@ -36,6 +36,12 @@ To fire it up the photo aggregator, you will need these pylibs:
 * requests
 * pymongo
 
+To install these in your virtualenv:
+
+``` bash
+$ pip install -r requirements.txt
+```
+
 and to create two files:
 
 * /path/to/instacane/instagram.token - 1 line, containing your Instagram access token.
